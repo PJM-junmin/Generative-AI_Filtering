@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Text to Image</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+</head>
+
+<body class="index-page scrolled">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="" class="logo d-flex align-items-center me-auto me-lg-0">
+        <h1 class="sitename">JunMin's Image Generator</h1>
+        <span>.</span>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#hero" class="active">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="#about">Get Started</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+     <!-- 로딩 화면 요소 추가 -->
+    <div id="loadingOverlay" style="display: none;">
+      <div class="spinner"></div>
+    </div>
+
+    <section id="hero" class="hero section">
+      <img src="{{ url_for('static', filename='img/hero-bg.jpg') }}" alt="" data-aos="fade-in">
+      <div class="container">
+        <div class="row justify-content-center text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="col-xl-6 col-lg-8">
+            <h2>Text to Image AI</h2>
+            <p>Generate images from text and apply filters</p>
+          </div>
+        </div>
+        <!-- 아이콘 클릭시, Github로 이동 -->
+        <div class="row gy-4 mt-5 justify-content-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-xl-2 col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="icon-box">
+              <i class="bi bi-card-list"></i>
+              <h3><a href="https://github.com/MandeepKharb/Youtube/blob/main/GenerativeAI/MultilingualTextToImageGenerator.ipynb" target="_blank">GitHub<br>StableDiffusion</a></h3>
+            </div>
+          </div>
+          <div class="col-xl-2 col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="icon-box">
+              <i class="bi bi-gem"></i>
+              <h3><a href="https://github.com/huggingface/instruction-tuned-sd" target="_blank">GitHub<br>Cartoon</a></h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    
+
+    <section id="generate-image" class="generate-image section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <form action="/generate" method="POST">
+          <div class="mb-3">
+            <label for="text" class="form-label">Enter Prompt:</label>
+            <input type="text" class="form-control" id="text" name="text" placeholder="Enter text to convert to image" required>
+          </div>
+          <div class="mb-3">
+            <label for="file_name" class="form-label">File Name:</label>
+            <input type="text" class="form-control" id="file_name" name="file_name" placeholder="Enter file name" required>
+          </div>
+          <div class="mb-3">
+            <label for="steps" class="form-label">Number of Steps (10 to 100):</label>
+            <input type="range" class="form-range" id="steps" name="steps" min="10" max="100" value="50" oninput="updateOutput(this.value, 'steps_output')">
+            <output id="steps_output">50</output>
+          </div>
+          <div class="mb-3">
+            <label for="guidance_scale" class="form-label">Guidance Scale (1 to 50):</label>
+            <input type="range" class="form-range" id="guidance_scale" name="guidance_scale" min="1" max="50" value="25" step="0.1" oninput="updateOutput(this.value, 'guidance_output')">
+            <output id="guidance_output">25</output>
+          </div>
+          <div class="mb-3">
+            <label for="seed" class="form-label">Seed (0 to 500):</label>
+            <input type="range" class="form-range" id="seed" name="seed" min="0" max="500" value="250" oninput="updateOutput(this.value, 'seed_output')">
+            <output id="seed_output">250</output>
+          </div>
+          <div class="mb-3">
+            <label for="size" class="form-label">Select Image Size:</label>
+            <select class="form-select" id="size" name="size" required>
+              <optgroup label="Web Section">
+                <option value="1366x768">1366x768 (Web 일반 크기)</option>
+                <option value="1920x1080">1920x1080 (Web 대형)</option>
+                <option value="1440x900">1440x900 (Web 중형)</option>
+                <option value="1280x800">1280x800 (Web 소형)</option>
+                <option value="2560x1600">2560x1600 (맥 북 프로 13)</option>
+                <option value="2880x1800">2880x1800 (맥 북 프로 15)</option>
+                <option value="2560x1440">2560x1440 (아이맥)</option>
+              </optgroup>
+              <optgroup label="Mobile Section">
+                <option value="1125x2436">1125x2436 (IPhone X)</option>
+                <option value="1242x2208">1242x2208 (IPhone 8/7/6 Plus)</option>
+                <option value="750x1334">750x1334 (IPhone 8/7/6)</option>
+                <option value="1080x1920">1080x1920 (Android 1080p)</option>
+                <option value="272x340">272x340 (Apple Watch 38mm)</option>
+              </optgroup>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Generate Image</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" class="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-4 col-md-6 footer-about">
+            <a href="index.html" class="logo d-flex align-items-center">
+              <span class="sitename">JunMin's AI</span>
+            </a>
+            <div class="footer-contact pt-3">
+              <p>20, Suyeong-ro 741beon-gil, Suyeong-gu</p>
+              <p>Busan, Republic of Korea</p>
+              <p class="mt-3"><strong>Phone:</strong> <span>+82 010 1234 5678</span></p>
+              <p><strong>Email:</strong> <span>3633qkrtk@gmail.com</span></p>
+            </div>
+            <div class="social-links d-flex mt-4">
+              <a href=""><i class="bi bi-twitter-x"></i></a>
+              <a href=""><i class="bi bi-facebook"></i></a>
+              <a href=""><i class="bi bi-instagram"></i></a>
+              <a href=""><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">About us</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Services</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Web Design</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Web Development</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Product Management</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Marketing</a></li>
+              <li><i class="bi bi-chevron-right"></i> <a href="#">Graphic Design</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-12 footer-newsletter">
+            <h4>Our Newsletter</h4>
+            <p>Subscribe to our newsletter and receive the latest news about our products and services!</p>
+            <form action="forms/newsletter.php" method="post" class="php-email-form">
+              <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">Your subscription request has been sent. Thank you!</div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="copyright">
+      <div class="container text-center">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">JunMin AI</strong> <span>All Rights Reserved</span></p>
+        <div class="credits">
+          Designed by <a href="https://bootstrapmade.com/">BootstrapMade and JunMin</a>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/purecounter/purecounter_vanilla.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    function updateOutput(val, outputId) {
+        document.getElementById(outputId).value = val;
+    }
+  </script>
+
+</body>
+
+</html>
